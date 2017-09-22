@@ -1,0 +1,33 @@
+@import '../variables'
+
+$container-width-xlg: 1152px
+$container-width-lg: 952px
+$container-width-md: 732px
+
+// Large screens
+@media screen and (min-width: $screen-lg)
+   .container
+      width: $container-width-xlg
+
+// Medium Screens
+@media screen and (max-width: $screen-lg)
+   .container
+      width: $container-width-lg
+
+// Small Screens
+@media screen and (max-width: $screen-md)
+   .container
+      width: $container-width-md
+      display: block
+
+   .btn-container
+      text-align: center
+
+   .btn-solve
+      margin: 50px 0
+
+// Extra Small Screens
+@media screen and (max-width: $screen-xsm)
+   .container
+      width: auto
+      padding: 0 8px

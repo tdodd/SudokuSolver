@@ -1,9 +1,14 @@
 <app-header></app-header>
 
-<div class="grid-container">
+<div class="container">
 
    <app-grid></app-grid>
-   <button class="btn-solve">Solve</button>
+
+   <div class="btn-container">
+      <button (click)="solve()" class="btn-solve">Solve</button>
+      <div class="loader hidden"></div>
+   </div>
+
    <app-grid></app-grid>
 
 </div>
