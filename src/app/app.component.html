@@ -2,15 +2,27 @@
 
 <div class="container">
 
-   <app-grid></app-grid>
+   <!-- First Grid -->
+   <app-grid *ngIf="data.puzzle"
+      [puzzle]="data.puzzle">
+   </app-grid>
 
+   <!-- Solve Button -->
    <div class="btn-container">
       <button (click)="solve()" class="btn-solve">Solve</button>
+      <div class="loading-msg hidden">Solving..</div>
       <div class="loader hidden"></div>
    </div>
 
-   <app-grid></app-grid>
+   <!-- Second Grid -->
+   <app-grid *ngIf="data.puzzle"
+      [puzzle]="data.puzzle">
+   </app-grid>
 
 </div>
 
-<app-status></app-status>
+<!-- Status Message -->
+<app-status *ngIf="data.duration"
+   [duration]="data.duration"
+   [error]="data.error">
+</app-status>

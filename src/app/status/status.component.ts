@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
    selector: 'app-status',
@@ -7,15 +7,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StatusComponent implements OnInit {
 
+   @Input() duration: number;
+   @Input() error: boolean;
+
    constructor() { }
 
    ngOnInit() {
    }
 
    /**
-   * Closes a status notification
-   */
-   closeStatus(event): void {
+    * Closes a status notification
+    */
+   closeStatus(): void {
       document.querySelector('.status-container').classList.add('hidden');
    }
 

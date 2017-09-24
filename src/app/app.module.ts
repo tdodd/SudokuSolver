@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { StatusComponent } from './status/status.component';
 import { GridComponent } from './grid/grid.component';
-import { UnitComponent } from './grid/unit/unit.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +12,6 @@ import { UnitComponent } from './grid/unit/unit.component';
     HeaderComponent,
     StatusComponent,
     GridComponent,
-    UnitComponent,
   ],
   imports: [
     BrowserModule

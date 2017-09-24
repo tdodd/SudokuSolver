@@ -28,6 +28,17 @@
    &:active, &:focus
       outline: none
 
+   &:disabled
+      background: gray
+
+      &:hover
+         cursor: default
+
+.loading-msg
+   font-size: 1.5rem
+   color: $success-color
+   margin-bottom: 25px
+
 // Loader
 .loader,
 .loader:before,

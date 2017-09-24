@@ -1,19 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { GridService } from './grid.service';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
    selector: 'app-grid',
    templateUrl: './grid.component.html',
-   styleUrls: ['./grid.component.sass', './grid.component.mobile.sass'],
-   providers: [GridService]
+   styleUrls: ['./grid.component.sass'],
 })
 export class GridComponent implements OnInit {
 
-   constructor(private GridService: GridService) { }
+   @Input() puzzle: string[];
 
    ngOnInit() {
-      const puzzle = this.GridService.getGrid();
-      this.prepareGrid(puzzle);
+      this.prepareGrid(this.puzzle);
    }
 
    /**
