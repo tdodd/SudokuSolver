@@ -1,10 +1,14 @@
 @import '../../variables'
 
+$grid-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)
+// $grid-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)
+
 .grid
    width: $grid-width
    height: $grid-width
    padding: 0
    margin: 0
+   box-shadow: $grid-shadow
 
    li
       list-style: none
@@ -18,9 +22,9 @@
    text-align: center
    background: white
    border: 1px solid rgba(0,0,0,.1)
-   padding: 5px
-   width: 35px
-   height: 35px
+   padding: 8px 5px 5px 5px
+   width: 37px
+   height: 37px
 
 // Borders
 .border-right

@@ -21,8 +21,8 @@ export class ValidationService {
       ];
 
       // Run all validation functions
-      for(const rule of rules) {
-         if (!rule(puzzle)) return false;
+      for (const rule of rules) {
+         if (!rule(puzzle)) { return false; }
       }
 
       return true;
@@ -49,11 +49,11 @@ export class ValidationService {
     */
    validateCharacters(puzzle: string) {
 
-      if(typeof (puzzle) === 'string') { // Check for empty puzzle
+      if (typeof(puzzle) === 'string') { // Check for empty puzzle
 
          for (const num of puzzle) {
 
-            if ((isNaN(parseInt(num)) && num !== '.') || parseInt(num) === 0) {
+            if ((isNaN(parseInt(num, 10)) && num !== '.') || parseInt(num, 10) === 0) {
                return false;
             }
 
@@ -73,14 +73,14 @@ export class ValidationService {
     */
    hasDuplicates(list: string) {
 
-      let seen = {}; // HashMap of seen values
+      const seen = {}; // HashMap of seen values
 
-      if(typeof(list) === 'string') {
+      if (typeof(list) === 'string') {
 
          for (const value of list) {
 
             if (value !== '.') {
-               if (value in seen) { return true };
+               if (value in seen) { return true; }
                seen[value] = true;
             }
 
@@ -106,8 +106,8 @@ export class ValidationService {
       const rows = makeRows(puzzle);
 
       // Check rows for duplicates
-      for(const row of rows) {
-         if (this.hasDuplicates(row)) return false;
+      for (const row of rows) {
+         if (this.hasDuplicates(row)) { return false; }
       }
 
       return true;
@@ -116,22 +116,22 @@ export class ValidationService {
        * Helper function for getting the rows in a puzzle
        *
        * @param {string} puzzle the puzzle to parse
-       * @return {array} an array containing each row as a string
+       * @return {string[]} an array containing each row as a string
        */
-      function makeRows(puzzle) {
+      function makeRows(p: string) {
 
-         let rows = [];
+         const r = [];
 
-         for (let i = 0; i < puzzle.length; i += 9) {
+         for (let i = 0; i < p.length; i += 9) {
 
             const start = i;
             const end = i + 9;
-            const row = puzzle.substring(start, end);
-            rows.push(row);
+            const row = p.substring(start, end);
+            r.push(row);
 
          }
 
-         return rows;
+         return r;
 
       }
 
@@ -151,7 +151,7 @@ export class ValidationService {
 
       // Check columns for duplicates
       for (const col of cols) {
-         if (this.hasDuplicates(col)) return false;
+         if (this.hasDuplicates(col)) { return false; }
       }
 
       return true;
@@ -159,24 +159,24 @@ export class ValidationService {
       /**
        * Helper function for getting the columns in a puzzle
       *
-      * @param {string} puzzle the puzzle to parse
-      * @return {array} an array containing each column as a string
+      * @param {string} p the puzzle to parse
+      * @return {string[]} an array containing each column as a string
       */
-      function makeCols(puzzle) {
+      function makeCols(p: string) {
 
-         let cols = [];
+         const c = [];
 
          for (let i = 0; i < 9; i++) {
             let col = '';
 
-            for (let j = i; j < puzzle.length; j += 9) {
-               col += puzzle[j];
+            for (let j = i; j < p.length; j += 9) {
+               col += p[j];
             }
 
-            cols.push(col);
+            c.push(col);
          }
 
-         return cols;
+         return c;
 
       }
 
@@ -196,7 +196,7 @@ export class ValidationService {
 
       // Check units for duplicates
       for (const unit of units) {
-         if (this.hasDuplicates(unit)) return false;
+         if (this.hasDuplicates(unit)) { return false; }
       }
 
       return true;
@@ -204,27 +204,27 @@ export class ValidationService {
       /**
        * Helper function for getting the units in a puzzle
        *
-       * @param {string} puzzle the puzzle to parse
-       * @return {array} an array containing all units for this puzzle
+       * @param {string} p the puzzle to parse
+       * @return {string[]} an array containing all units for this puzzle
        */
-      function makeUnits(puzzle) {
+      function makeUnits(p: string) {
 
-         let units = [];
+         const u = [];
 
          for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 9; j += 3) {
 
                const pos = j + (i * 27);
-               const firstRow = puzzle.substring(pos, pos + 3);
-               const secondRow = puzzle.substring(pos + 9, pos + 12);
-               const thirdRow = puzzle.substring(pos + 18, pos + 21);
+               const firstRow = p.substring(pos, pos + 3);
+               const secondRow = p.substring(pos + 9, pos + 12);
+               const thirdRow = p.substring(pos + 18, pos + 21);
                const unit = firstRow + secondRow + thirdRow;
-               units.push(unit);
+               u.push(unit);
 
             }
          }
 
-         return units;
+         return u;
 
       }
 

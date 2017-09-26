@@ -6,10 +6,10 @@ import { Component, OnInit, Input } from '@angular/core';
    styleUrls: ['./grid.component.sass'],
 })
 export class GridComponent implements OnInit {
-
    @Input() puzzle: string[];
 
    ngOnInit() {
+      // Insert puzzle values into the grid
       this.prepareGrid(this.puzzle);
    }
 
@@ -27,7 +27,7 @@ export class GridComponent implements OnInit {
          if (i < 81) { // First Grid
             gridSquares[i].innerHTML = puzzle[i] === '.' ? '' : puzzle[i];
          } else { // Second grid
-            gridSquares[i].innerHTML = puzzle[i - 81] === '.' ? '' : puzzle[i - 81];
+            gridSquares[i].innerHTML = '';
          }
 
       }

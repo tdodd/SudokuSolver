@@ -14,7 +14,7 @@
       <div class="loader hidden"></div>
    </div>
 
-   <!-- Second Grid -->
+   <!-- Empty Grid Before Solution -->
    <app-grid *ngIf="data.puzzle"
       [puzzle]="data.puzzle">
    </app-grid>
@@ -22,7 +22,7 @@
 </div>
 
 <!-- Status Message -->
-<app-status *ngIf="data.duration"
+<app-status *ngIf="data.duration || data.error"
    [duration]="data.duration"
    [error]="data.error">
 </app-status>

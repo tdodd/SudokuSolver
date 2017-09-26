@@ -10,7 +10,6 @@ import { ValidationService } from './validation.service';
    providers: [GridService, SudokuService, ValidationService]
 })
 export class AppComponent {
-
    data = { error: false };
 
    constructor(
@@ -18,6 +17,7 @@ export class AppComponent {
       private Grid: GridService) { }
 
    ngOnInit() {
+      // Ask service for grid to display
       this.data['puzzle'] = this.Grid.gridAsArray();
    }
 
@@ -38,19 +38,23 @@ export class AppComponent {
       this.Sudoku.solve(puzzle)
          .then(solution => {
 
+            // Time after solving
             const t1 = performance.now();
 
-            // Time to solve the puzzle (in ms)
+            // Time to solve the puzzle rounded to 4 decimal places (in ms)
             this.data['duration'] = ((t1 - t0) / 1000).toFixed(4);
 
             // Hide loading animation
             this.hideLoadingAnimation();
 
-            // TODO: Show solved puzzle
-            console.log('solution:', solution);
+            // Show solved puzzle
+            this.Grid.prepareSolution(solution);
 
          })
-         .catch(error => this.data['error'] = true);
+         .catch(error => {
+            this.data['error'] = true;
+            this.hideLoadingAnimation();
+         });
 
    }
 

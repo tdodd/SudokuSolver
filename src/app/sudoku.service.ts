@@ -10,18 +10,18 @@ export class SudokuService {
     * Solves a valid sudoku puzzle
     *
     * @param {string} puzzle the puzzle being solved
-    * @return {Promise<string>} the solved puzzle
+    * @return {Promise<string[]>} the solved puzzle
     */
-   solve(puzzle): Promise<string> {
+   solve(puzzle): Promise<string[]> {
 
       return new Promise((resolve, reject) => {
 
-         // Validate the puzzle before solving it
-         if (!this.Validation.validatePuzzle(puzzle)) reject();
+         // // Validate the puzzle before solving it
+         // if (!this.Validation.validatePuzzle(puzzle)) {
+         //    reject();
+         // } else { // Puzzle is valid
 
-         else { // Puzzle is valid
-
-            let solution = '';
+            let solution = '999999999999999999999999999999999999999999999999999999999999999999999999999999999';
 
             // Build grid from rows and columns
             const rows = 'ABCDEFGHI';
@@ -35,18 +35,17 @@ export class SudokuService {
             // Convert the puzzle into a HashMap of the form { square: val }
             const gridMap = this.parseGrid(puzzle, grid);
 
-            //
-            for (let c in grid) {
-               if (true) return;
-            }
+            const data = {
+               dgrid: grid,
+               dunits: units,
+               dpeers: peers,
+               dmap: gridMap
+            };
+            console.log(data);
 
-            for (let c in gridMap) {
-               if (true) return;
-            }
+            resolve(solution.split(''));
 
-            resolve(solution);
-
-         }
+         // }
 
       });
 
@@ -82,9 +81,11 @@ export class SudokuService {
    makeHorizontalPeers(rows: string, cols: string) {
 
       // Check for empty values
-      if (typeof(rows) !== 'string' || typeof(cols) !== 'string') return [];
+      if (typeof(rows) !== 'string' || typeof(cols) !== 'string') {
+         return [];
+      }
 
-      let horizontalPeers = [];
+      const horizontalPeers = [];
 
       for (let r = 0; r < cols.length; r++) {
          const index = rows[r] + (r + 1);
@@ -105,9 +106,11 @@ export class SudokuService {
    makeVerticalPeers(rows: string, cols: string) {
 
       // Check for empty values
-      if (typeof (rows) !== 'string' || typeof (cols) !== 'string') return [];
+      if (typeof (rows) !== 'string' || typeof (cols) !== 'string') {
+         return [];
+      }
 
-      let verticalPeers = [];
+      const verticalPeers = [];
 
       for (let c = 0; c < cols.length; c++) {
          verticalPeers.push(this.crossProduct(rows, cols[c]));
@@ -126,7 +129,7 @@ export class SudokuService {
     */
    makeSquarePeers() {
 
-      let squarePeers = [];
+      const squarePeers = [];
 
       const rowTriplet = ['ABC', 'DEF', 'GHI'];
       const colTriplet = ['123', '456', '789'];
@@ -153,7 +156,7 @@ export class SudokuService {
     */
    makeUnits(rows: string, cols: string, grid: string[]) {
 
-      let units = {};
+      const units = {};
 
       // Make all 3 peer types
       const horizontalPeers = this.makeHorizontalPeers(rows, cols);
@@ -192,7 +195,7 @@ export class SudokuService {
     */
    makePeers(grid: string[], units: any) {
 
-      let peers = {};
+      const peers = {};
 
       for (const square of grid) { // All squares in the grid
 
@@ -224,11 +227,11 @@ export class SudokuService {
    crossProduct(listA: string, listB: string) {
 
       // Check for empty sets
-      if (!listA && !listB) return [];
-      else if (!listA) return listB;
-      else if (!listB) return listA;
+      if (!listA && !listB) { return []; }
+      if (!listA) { return listB; }
+      if (!listB) { return listA; }
 
-      let crossProduct = [];
+      const crossProduct = [];
 
       for (const a of listA) {
          for (const b of listB) {
@@ -250,16 +253,16 @@ export class SudokuService {
     */
    parseGrid(puzzle: string, grid: string[]) {
 
-      let hashMap = {};
+      const gridMap = {};
 
       for (const val of grid) {
 
-         // Assign value or replace empty squares with 123456789
-         hashMap[val] = val === '.' ? '123456789' : val;
+         // Assign value or replace empty squares with all possible values
+         gridMap[val] = val === '.' ? '123456789' : val;
 
       }
 
-      return hashMap;
+      return gridMap;
 
    }
 
@@ -279,7 +282,7 @@ export class SudokuService {
       const otherValues = map[square].replace(value, '');
 
       // Remove other values from this square and update peers
-      for (let otherValue of otherValues) {
+      for (const otherValue of otherValues) {
          this.removeValue(map, units, peers, square, otherValue);
       }
 
@@ -299,37 +302,41 @@ export class SudokuService {
     */
    removeValue(map: any, units: string[], peers: any, square: string, value: string) {
 
-      let s = map[square]; // List of possible values for this square
+      const s = map[square]; // List of possible values for this square
 
       // This value has already been assigned
-      if(s.indexOf([value]) === -1) return map;
+      if (s.indexOf([value]) === -1) { return map; }
 
       // Remove the value from the possible values for this square
       map[square] = s.replace(value, '');
 
       // Once a value is permenantly assigned, remove it from its peers
-      if(s.length === 1) {
+      if (s.length === 1) {
 
          const remainingValues = s;
 
-         for (let peer of peers[square]) {
+         for (const peer of peers[square]) {
             this.removeValue(map, units, peers, peer, remainingValues);
          }
 
       }
 
       // If a unit is reduced to one place for a value, place it there
-      for (let unit of units[square]) {
+      for (const unit of units[square]) {
 
-         let places = [];
+         const places = [];
 
          // Assign places for this unit
-         for (let unitSquare of unit) {
-            if (map[unitSquare].indexOf(value) !== -1) places.push(unitSquare);
+         for (const unitSquare of unit) {
+            if (map[unitSquare].indexOf(value) !== -1) {
+               places.push(unitSquare);
+            }
          }
 
          // Assign value
-         if (places.length === 1) this.assignValue(map, units, peers, places[0], value);
+         if (places.length === 1) {
+            this.assignValue(map, units, peers, places[0], value);
+         }
 
       }
 
@@ -346,10 +353,12 @@ export class SudokuService {
     */
    search(map: any, grid: any) {
 
-      if (!map) return false;
+      if (!map) { return false; }
 
       // Puzzle solved
-      if (true) return map;
+      if (true) {
+         return map;
+      }
 
    }
 
