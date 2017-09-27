@@ -3,7 +3,7 @@ import { Component, OnInit, Input } from '@angular/core';
 @Component({
    selector: 'app-grid',
    templateUrl: './grid.component.html',
-   styleUrls: ['./grid.component.sass'],
+   styleUrls: ['./grid.component.sass', './grid.component.mobile.sass'],
 })
 export class GridComponent implements OnInit {
    @Input() puzzle: string[];

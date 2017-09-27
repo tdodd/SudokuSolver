@@ -7,9 +7,9 @@ export class ValidationService {
     * Use all validation rules on a puzzle
     *
     * @param {string} puzzle the puzzle to validate
-    * @return {bool} true if the puzzle is valid and false otherwise
+    * @return {boolean} true if the puzzle is valid and false otherwise
     */
-   validatePuzzle(puzzle: string) {
+   validatePuzzle(puzzle: string): boolean {
 
       // Validation rules
       const rules = [
@@ -34,10 +34,10 @@ export class ValidationService {
     * A puzzle must be a string of 81 characters
     *
     * @param {string} puzzle the puzzle to check
-    * @return {bool} true if the puzzle is of valid length and false otherwise
+    * @return {boolean} true if the puzzle is of valid length and false otherwise
     */
-   validateLength(puzzle: string) {
-      return typeof (puzzle) === 'string' && puzzle.length === 81;
+   validateLength(puzzle: string): boolean {
+      return typeof(puzzle) === 'string' && puzzle.length === 81;
    }
 
    /**
@@ -45,9 +45,9 @@ export class ValidationService {
     * All characters must be a number in range (1-9) or '.'
     *
     * @param {string} puzzle the puzzle to check
-    * @return {bool} true if the puzzle only contains valid characters and false otherwise
+    * @return {boolean} true if the puzzle only contains valid characters and false otherwise
     */
-   validateCharacters(puzzle: string) {
+   validateCharacters(puzzle: string): boolean {
 
       if (typeof(puzzle) === 'string') { // Check for empty puzzle
 
@@ -69,9 +69,9 @@ export class ValidationService {
     * Check a string for duplicate values
     *
     * @param {string} list the list to check
-    * @return {bool} true if the list has duplicates and false otherwise
+    * @return {boolean} true if the list has duplicates and false otherwise
     */
-   hasDuplicates(list: string) {
+   hasDuplicates(list: string): boolean {
 
       const seen = {}; // HashMap of seen values
 
@@ -98,9 +98,9 @@ export class ValidationService {
     * The same value can not appear twice in a single row
     *
     * @param {string} puzzle the puzzle to validate
-    * @return {bool} true if all rows are valid and false otherwise
+    * @return {boolean} true if all rows are valid and false otherwise
     */
-   validateRows = (puzzle: string) => {
+   validateRows = (puzzle: string): boolean => {
 
       // Build puzzle rows
       const rows = makeRows(puzzle);
@@ -142,9 +142,9 @@ export class ValidationService {
     * The same value can not appear twice in a single column
     *
     * @param {string} puzzle the puzzle to validate
-    * @return {bool} true if all columns are valid and false otherwise
+    * @return {boolean} true if all columns are valid and false otherwise
     */
-   validateColumns = (puzzle: string) => {
+   validateColumns = (puzzle: string): boolean => {
 
       // Build puzzle columns
       const cols = makeCols(puzzle);
@@ -187,9 +187,9 @@ export class ValidationService {
     * The same value can not appear twice in a single unit
     *
     * @param {string} puzzle the puzzle to validate
-    * @return {bool} true if all units are valid and false otherwise
+    * @return {boolean} true if all units are valid and false otherwise
     */
-   validateUnits = (puzzle: string) => {
+   validateUnits = (puzzle: string): boolean => {
 
       // Build puzzle units
       const units = makeUnits(puzzle);

@@ -3,49 +3,55 @@ import { ValidationService } from './validation.service';
 
 @Injectable()
 export class SudokuService {
+   rows: string;
+   cols: string;
+   grid: string[];
+   units: string[];
+   peers: any;
+   map: any;
 
-   constructor(private Validation: ValidationService) { }
+   constructor(private Validation: ValidationService) {
+      this.rows = 'ABCDEFGHI';
+      this.cols = '123456789';
+   }
 
    /**
     * Solves a valid sudoku puzzle
     *
     * @param {string} puzzle the puzzle being solved
-    * @return {Promise<string[]>} the solved puzzle
+    * @return {Promise<string>} the solved puzzle
     */
-   solve(puzzle): Promise<string[]> {
+   public solve = (puzzle): Promise<string> => {
 
       return new Promise((resolve, reject) => {
 
          // // Validate the puzzle before solving it
-         // if (!this.Validation.validatePuzzle(puzzle)) {
-         //    reject();
-         // } else { // Puzzle is valid
+         if (!this.Validation.validatePuzzle(puzzle)) {
 
-            let solution = '999999999999999999999999999999999999999999999999999999999999999999999999999999999';
+            reject();
 
-            // Build grid from rows and columns
-            const rows = 'ABCDEFGHI';
-            const cols = '123456789';
-            const grid = this.makeGrid(rows, cols);
+         } else { // Puzzle is valid
 
-            // Build the lists of units and peers
-            const units = this.makeUnits(rows, cols, grid);
-            const peers = this.makePeers(grid, units);
+            let solution = '';
+
+            // Build grid from rows and cols
+            this.grid = this.makeGrid();
+
+            // List of units and peers in the grid
+            this.units = this.makeUnits();
+            this.peers = this.makePeers();
 
             // Convert the puzzle into a HashMap of the form { square: val }
-            const gridMap = this.parseGrid(puzzle, grid);
+            // Reduce possibilities for each square based on current puzzle values
+            this.map = this.parseGrid(puzzle);
 
-            const data = {
-               dgrid: grid,
-               dunits: units,
-               dpeers: peers,
-               dmap: gridMap
-            };
-            console.log(data);
+            // Solve the puzzle
+            const solvedMap = this.search(this.map);
+            solution = this.parseMap(solvedMap);
 
-            resolve(solution.split(''));
+            resolve(solution);
 
-         // }
+         }
 
       });
 
@@ -54,16 +60,14 @@ export class SudokuService {
    /**
     * Build the sudoku grid
     *
-    * @param {string} rows the grid rows
-    * @param {string} cols the grid columns
     * @return {string[]} the sudoku grid
     */
-   makeGrid(rows: string, cols: string): string[] {
+   public makeGrid = (): string[] => {
 
       let grid = [];
 
-      for (let c = 0; c < cols.length; c++) {
-         const gridRow = this.crossProduct(rows, cols[c]);
+      for (let c = 0; c < 9; c++) {
+         const gridRow = this.crossProduct(this.rows, this.cols[c]);
          grid = grid.concat(gridRow);
       }
 
@@ -74,22 +78,15 @@ export class SudokuService {
    /**
     * Build a list of horizontal units
     *
-    * @param {string} rows row labels
-    * @param {string} cols column numbers
-    * @return {string[]} the horizontal units in the grid
+    * @return {any[]} the horizontal units in the grid
     */
-   makeHorizontalPeers(rows: string, cols: string) {
-
-      // Check for empty values
-      if (typeof(rows) !== 'string' || typeof(cols) !== 'string') {
-         return [];
-      }
+   public makeHorizontalPeers = (): any[] => {
 
       const horizontalPeers = [];
 
-      for (let r = 0; r < cols.length; r++) {
-         const index = rows[r] + (r + 1);
-         horizontalPeers.push(this.crossProduct(rows[r], cols));
+      for (let r = 0; r < 9; r++) {
+         const index = this.rows[r] + (r + 1);
+         horizontalPeers.push(this.crossProduct(this.rows[r], this.cols));
       }
 
       return horizontalPeers;
@@ -99,21 +96,14 @@ export class SudokuService {
    /**
     * Build a list of vertical units
     *
-    * @param {string} rows row labels
-    * @param {string} cols column numbers
-    * @return {string[]} the vertical units in the grid
+    * @return {any[][]} the vertical units in the grid
     */
-   makeVerticalPeers(rows: string, cols: string) {
-
-      // Check for empty values
-      if (typeof (rows) !== 'string' || typeof (cols) !== 'string') {
-         return [];
-      }
+   public makeVerticalPeers = (): any[][] => {
 
       const verticalPeers = [];
 
-      for (let c = 0; c < cols.length; c++) {
-         verticalPeers.push(this.crossProduct(rows, cols[c]));
+      for (let c = 0; c < 9; c++) {
+         verticalPeers.push(this.crossProduct(this.rows, this.cols[c]));
       }
 
       return verticalPeers;
@@ -123,11 +113,9 @@ export class SudokuService {
    /**
     * Build a list of square units
     *
-    * @param {string} rows row labels
-    * @param {string} cols column numbers
-    * @return {array} the square units in the grid
+    * @return {any[][]} the square units in the grid
     */
-   makeSquarePeers() {
+   public makeSquarePeers = (): any[][] => {
 
       const squarePeers = [];
 
@@ -149,29 +137,29 @@ export class SudokuService {
    /**
     * Create a HashMap of all squares and their associated units
     *
-    * @param {string} rows row labels
-    * @param {string} cols column numbers
-    * @param {array} grid grid squares
-    * @return {obj} a HashMap containing the units
+    * @return {any} a HashMap containing the units
     */
-   makeUnits(rows: string, cols: string, grid: string[]) {
+   public makeUnits = (): any => {
 
       const units = {};
 
       // Make all 3 peer types
-      const horizontalPeers = this.makeHorizontalPeers(rows, cols);
-      const verticalPeers = this.makeVerticalPeers(rows, cols);
+      const horizontalPeers = this.makeHorizontalPeers();
+      const verticalPeers = this.makeVerticalPeers();
       const squarePeers = this.makeSquarePeers();
 
       // Merge all 3 types into one array
       const unitList = horizontalPeers.concat(verticalPeers, squarePeers);
 
-      // Map each grid square to its units
-      for (const val of grid) {
+      // Map each square to its units
+      for (const s in this.grid) {
 
+         const val = this.grid[s]; // The current grid square
          units[val] = [];
 
-         for (const unit of unitList) {
+         for (const u in unitList) {
+
+            const unit = unitList[u]; // A unit to associate with this square
 
             if (unit.indexOf(val) !== -1) {
                units[val].push(unit);
@@ -188,33 +176,34 @@ export class SudokuService {
    /**
     * Create a HashMap of all peers for a given square
     *    ex: { A1: { B1: true, A2: true } }
-    *
-    * @param {array} grid an array representing the grid
-    * @param {obj} units a HashMap containing all units for a given square in the grid
-    * @return {obj} a HashMap of peers for all squares in the grid
+    * @return {any} a HashMap of peers for all squares in the grid
     */
-   makePeers(grid: string[], units: any) {
+   public makePeers = (): any => {
 
-      const peers = {};
+      let peers = {};
 
-      for (const square of grid) { // All squares in the grid
+      for (const s in this.grid) { // All squares in the grid
 
+         const square = this.grid[s]; // The current square
          peers[square] = {};
 
-         for (const unit of units[square]) { // This square's units
-            for (const currentUnit of unit) { // Squares in this unit
+         for (const u in this.units[square]) { // This square's units
 
-               if (currentUnit !== square) { // A square can't be its own peer
-                  peers[square][currentUnit] = true;
+            const unit = this.units[square][u]; // The current unit
+
+            for (const unitSquare in unit) { // Squares in this unit
+
+               if (unit[unitSquare] !== square) { // A square can't be its own peer
+                  peers[square][unit[unitSquare]] = true;
                }
 
             }
+
          }
 
       }
 
       return peers;
-
    }
 
    /**
@@ -224,7 +213,7 @@ export class SudokuService {
     * @param {string} listB the second list
     * @return {string[]} the resulting cross product of the two lists
     */
-   crossProduct(listA: string, listB: string) {
+   public crossProduct = (listA: string, listB: string) => {
 
       // Check for empty sets
       if (!listA && !listB) { return []; }
@@ -248,45 +237,54 @@ export class SudokuService {
     *    ex: { A1: 7, B1: 2 }
     *
     * @param {string} puzzle the puzzle being solved
-    * @param {string[]} grid the grid to parse
-    * @return {obj} the HashMap representing the grid
+    * @return {any} the HashMap representing the grid
     */
-   parseGrid(puzzle: string, grid: string[]) {
+   public parseGrid = (puzzle: string): any => {
 
-      const gridMap = {};
+      const hashMap = {};
 
-      for (const val of grid) {
+      for (const square of this.grid) {
+         hashMap[square] = '123456789';
+      }
 
-         // Assign value or replace empty squares with all possible values
-         gridMap[val] = val === '.' ? '123456789' : val;
+      // Assign puzzle values
+      for (const s in this.grid) {
+
+         if (puzzle[s] !== '.' && !this.assignValue(hashMap, this.grid[s], puzzle[s])) {
+            return false;
+         }
 
       }
 
-      return gridMap;
+      return hashMap;
 
    }
 
    /**
     * Assign a value to a square, and remove it as a possibility for any of its peers
     *
-    * @param {obj} map the HashMap representation of the puzzle
-    * @param {string[]} units the unit list for the grid
-    * @param {obj} peers the peer map for the grid
+    * @param {any} map the HashMap representation of the puzzle
     * @param {string} square the grid square who's value is being assigned
     * @param {string} value the value to assign to the square
-    * @return {obj} the updated map
+    * @return {any} the updated map
     */
-   assignValue(map: any, units: string[], peers: any, square: string, value: string) {
+   public assignValue = (map: any, square: string, value: string): any => {
+
+      let assigned = true;
 
       // All values except the value to assign
       const otherValues = map[square].replace(value, '');
 
       // Remove other values from this square and update peers
-      for (const otherValue of otherValues) {
-         this.removeValue(map, units, peers, square, otherValue);
+      for (let otherValue of otherValues) {
+
+         if (!this.removeValue(map, square, otherValue)) {
+            assigned = false;
+         }
+
       }
 
-      return map;
+      return assigned ? map : false;
 
    }
 
@@ -294,48 +292,63 @@ export class SudokuService {
     * Remove a possible value from a square
     *
     * @param {obj} map the HashMap representation of the puzzle
-    * @param {obj} peers the peer map for the grid
-    * @param {string[]} units the unit map for the grid
     * @param {string} square the grid square having the value removed
     * @param {string} value the value to remove from the square
-    * @return {obj} the updated map
+    * @return {any} the updated map
     */
-   removeValue(map: any, units: string[], peers: any, square: string, value: string) {
-
-      const s = map[square]; // List of possible values for this square
+   public removeValue = (map: any, square: string, value: string): any => {
 
       // This value has already been assigned
-      if (s.indexOf([value]) === -1) { return map; }
+      if (map[square].indexOf([value]) === -1) return map;
 
       // Remove the value from the possible values for this square
-      map[square] = s.replace(value, '');
+      map[square] = map[square].replace(value, '');
+
+      // Removed last value
+      if (map[square].length === 0) { return false; }
 
       // Once a value is permenantly assigned, remove it from its peers
-      if (s.length === 1) {
+      if (map[square].length === 1) {
 
-         const remainingValues = s;
+         let removed = true;
+         const peerList = Object.keys(this.peers[square]);
 
-         for (const peer of peers[square]) {
-            this.removeValue(map, units, peers, peer, remainingValues);
+         for (const peer of peerList) {
+
+            if (!this.removeValue(map, peer, map[square])) {
+               removed = false;
+            }
+
          }
+
+         return removed;
 
       }
 
       // If a unit is reduced to one place for a value, place it there
-      for (const unit of units[square]) {
+      for (const unit of this.units[square]) {
 
          const places = [];
 
-         // Assign places for this unit
-         for (const unitSquare of unit) {
+         // Get places where the value is still a possibility
+         for (let unitSquare of unit) {
+
             if (map[unitSquare].indexOf(value) !== -1) {
                places.push(unitSquare);
             }
+
          }
 
-         // Assign value
+         // No place for this value
+         if (places.length === 0) { return false; }
+
+         // Only 1 possible place. Assign value
          if (places.length === 1) {
-            this.assignValue(map, units, peers, places[0], value);
+
+            if (!this.assignValue(map, places[0], value)) {
+               return false;
+            }
+
          }
 
       }
@@ -345,20 +358,93 @@ export class SudokuService {
    }
 
    /**
+    * Test all possible values with DFS
     *
-    *
-    * @param {obj} map the HashMap representation of the puzzle
-    * @param {obj} grid the HashMap representing the grid
-    * @return {}
+    * @param {any} map the HashMap representation of the puzzle
+    * @return {any} the solved puzzle as a HashMap
     */
-   search(map: any, grid: any) {
+   public search = (map: any): any => {
 
-      if (!map) { return false; }
+      if (!map) return false; // assignValue failed
 
-      // Puzzle solved
-      if (true) {
-         return map;
+      let solved = true;
+
+      // Check if puzzle has been solved
+      for (const square of this.grid) {
+
+         if (map[square].length !== 1) {
+            solved = false;
+            break;
+         }
+
       }
+
+      if (solved) { return map; } // Puzzle solved
+
+      // Proceed with the square that has the least posibilities
+      let nextSquare;
+
+      for (const s of this.grid) {
+
+         if (map[s].length > 1) {
+
+            if (!nextSquare) {
+               nextSquare = s;
+            } else {
+               if (map[s].length < nextSquare.length) { nextSquare = s; }
+            }
+
+         }
+
+      }
+
+      // Assign values
+      if (nextSquare) {
+
+         for (const currentVal of map[nextSquare]) {
+            const result = this.search(this.assignValue(clone(map), nextSquare, currentVal));
+            if (result) { return result; }
+         }
+
+      }
+
+      return false;
+
+      /**
+       * Create a clone of an object
+       *
+       * @param {obj} obj the object to clone
+       * @return {obj} a clone of the object
+       */
+      function clone(obj) {
+
+         var clone = {};
+
+         for (var key in obj) {
+            clone[key] = obj[key];
+         }
+
+         return clone;
+
+      }
+
+   }
+
+   /**
+    * Transform the solution HashMap into a string
+    *
+    * @param {any} map the solution as a HashMap
+    * @return {string} the string representing the solution
+    */
+   public parseMap = (map: any): string => {
+
+      let solution = '';
+
+      for(const square in map) {
+         solution += map[square];
+      }
+
+      return solution;
 
    }
 

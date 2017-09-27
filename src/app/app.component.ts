@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GridService } from './grid.service';
+import { GridService } from './grid/grid.service';
 import { SudokuService } from './sudoku.service';
 import { ValidationService } from './validation.service';
 
@@ -41,14 +41,14 @@ export class AppComponent {
             // Time after solving
             const t1 = performance.now();
 
-            // Time to solve the puzzle rounded to 4 decimal places (in ms)
-            this.data['duration'] = ((t1 - t0) / 1000).toFixed(4);
+            // Time to solve the puzzle rounded to 2 decimal places (in ms)
+            this.data['duration'] = ((t1 - t0) / 10).toFixed(2);
 
             // Hide loading animation
             this.hideLoadingAnimation();
 
             // Show solved puzzle
-            this.Grid.prepareSolution(solution);
+            this.Grid.prepareSolution(solution.split(''));
 
          })
          .catch(error => {

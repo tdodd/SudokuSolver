@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PUZZLES } from './puzzles';
+import { PUZZLES } from '../puzzles';
 
 @Injectable()
 export class GridService {
@@ -10,7 +10,7 @@ export class GridService {
     * @return {string} the puzzle
     */
    getGrid(): string {
-      return PUZZLES.easy;
+      return PUZZLES.hardest;
    }
 
    /**
