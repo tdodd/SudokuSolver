@@ -8,6 +8,13 @@ The goal of this program is to solve any given valid Sudoku puzzle in a finite a
 + The puzzle displayed to the user is found in `src/app/grid/grid.service.ts`
 + Change the puzzle name in `getGrid()` to `PUZZLES.YOUR_PUZZLE_NAME`
 
+## Dependencies
+In order to run the project in the browser, you will need
++ Node.js and npm
++ Angular CLI: `npm install -g @angular/cli`
+
+Before running the development server, be sure to run `npm install` inside the project root directory
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
